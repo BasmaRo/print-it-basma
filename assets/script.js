@@ -16,20 +16,18 @@ const slides = [
 		"tagLine":"Autocollants <span>avec découpe laser sur mesure</span>"
 	}
 ]
+
+document.addEventListener('DOMContentLoaded', demarrage);
+
 const nextBtn =document.getElementsByClassName("arrow_right")[0];
 const prevBtn=document.getElementsByClassName("arrow_left")[0];
 const dots = document.getElementsByClassName("dots")[0];
 
 // les deux lignes qui suivent seront utilisé pour mettre en évidence les deux boutton par rapport au changement du carrousel.
-nextBtn.style ='z-index: 1';
-prevBtn.style ='z-index: 1';
 let currentItem = 0;
 let precedentItem = 0;
 let container = document.createElement('div');
 //----------------------------
-
-document.addEventListener('DOMContentLoaded', demarrage);
-
 
 function demarrage() {
 	// Div banner qui contiendra notre carrousel
@@ -37,21 +35,21 @@ function demarrage() {
 
 	// on crée une div qui contiendra les différents image de notre carrousel
 	
-	container.setAttribute('class', 'carrousel_container');
-	//container.style.transform='translate3d(0%,0,0)';
+	container.className= 'carrousel_container';
+	container.style = 'z-index: -1';
 
 	// On intégre notre div container dans la div banner
 	bannerDiv.appendChild(container);
 
 	// on boucle le tableau de slides
-	let firstIteration = true;
 
-	slides.forEach((slide,i) => {		
+	slides.forEach((slide,i) => {
+		//La méthode forEach() transmet une boucle de rappel (callback) à chaque éléments du tableau		
 		// on crée un nouveau élément et on update sa src et alt attributes
 		let img = document.createElement('img');
 		img.src = slide.image;
 		img.alt = slide.tagLine;
-		img.className = 'banner-img'
+		img.className = 'banner-img';
 		// on rajoute notre image à l'intérieur de notre div container
 		container.appendChild(img);
 
@@ -62,52 +60,57 @@ function demarrage() {
 		} else {
 			dot.className = 'dot';
 		}
-		dot.style ='z-index: 1';
 		console.log(i);
 		dot.id = i;
 		dots.appendChild(dot);
 	});
-	
-
 }
 
-
 nextBtn.addEventListener("click", function(){
-	//alert("click sur la flèche droite");
-	console.info("click sur la flèche droite");
+	console.log("click sur la flèche droite");
 	precedentItem = currentItem;
 	if(currentItem === 3) currentItem =-1;
-	goTo(++currentItem, precedentItem);
+	goTo(++currentItem);
 })
 
 prevBtn.addEventListener("click", function(){
-	//alert("click sur la flèche gauche");
-	console.info("click sur la flèche gauche");
+	console.log("click sur la flèche gauche");
 	precedentItem = currentItem;
 	if(currentItem === 0) currentItem =4;
-	goTo(--currentItem, precedentItem);
+	goTo(--currentItem);
 })
 
-function goTo(index, precedentPosition) {
+function goTo(index) {
 	console.log(index);
-	let currentPosition = Math.abs(index);
-	let translateX = currentPosition * -100;
-	//update the image
-	let containerCarrousel=document.getElementsByClassName("carrousel_container")[0];
-	containerCarrousel.style.transform = 'translate3d(' + translateX + '%, 0, 0)';
+	let currentPosition = Math.abs(index); //La valeur absolue du nombre passé en argument.
+
+	//switch the image : 
+	switchImage(currentPosition);
+
 	// update the text
-	let paragraphe = document.getElementsByTagName("p")[0];
-	let newText = slides[currentPosition].tagLine;
-	paragraphe.innerHTML = newText;
-	paragraphe.style = 'z-index: 1';
+	updateText(currentPosition);
 
 	// update the dots
+	updateDot(currentPosition);	
+}
+
+function switchImage(Position) {
+	let translateX = Position * -100;
+	let containerCarrousel=document.getElementsByClassName("carrousel_container")[0];
+	containerCarrousel.style.transform = 'translate3d(' + translateX + '%, 0, 0)';
+}
+
+function updateText(Position){
+	let paragraphe = document.getElementsByTagName("p")[0];
+	let newText = slides[Position].tagLine;
+	paragraphe.innerHTML = newText;
+}
+
+function updateDot(Position){
 	let precendentDot = document.getElementById(precedentItem);
 	precendentDot.className = 'dot';
 
-	let currentDot = document.getElementById(currentPosition);
+	let currentDot = document.getElementById(Position);
 	currentDot.className = 'dot dot_selected';
-
-	currentItem = index;
 }
 
