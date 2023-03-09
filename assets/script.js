@@ -18,7 +18,8 @@ const slides = [
 ]
 
 document.addEventListener('DOMContentLoaded', demarrage);
-
+//la manière d'enregistrer un écouteur d'évènements telle que spécifiée dans le DOM.
+//(DOM) permet à des scripts d'examiner et de modifier le contenu du navigateur web.
 const nextBtn =document.getElementsByClassName("arrow_right")[0];
 const prevBtn=document.getElementsByClassName("arrow_left")[0];
 const dots = document.getElementsByClassName("dots")[0];
@@ -49,19 +50,22 @@ function demarrage() {
 		let img = document.createElement('img');
 		img.src = slide.image;
 		img.alt = slide.tagLine;
-		img.className = 'banner-img';
-		// on rajoute notre image à l'intérieur de notre div container
-		container.appendChild(img);
-
+		img.id= 'banner-img-'+i;
 		// ON ajoute les dots
+		//étape 4
 		let dot = document.createElement('div');
 		if(i==0) {
 			dot.className = 'dot dot_selected';
+			img.classList.add('show');
 		} else {
 			dot.className = 'dot';
+			img.classList.add('hide');
 		}
 		console.log(i);
 		dot.id = i;
+		//......
+		// on rajoute notre image et dot à l'intérieur de notre div container
+		container.appendChild(img);
 		dots.appendChild(dot);
 	});
 }
@@ -69,48 +73,54 @@ function demarrage() {
 nextBtn.addEventListener("click", function(){
 	console.log("click sur la flèche droite");
 	precedentItem = currentItem;
-	if(currentItem === 3) currentItem =-1;
-	goTo(++currentItem);
+	if(currentItem === slides.length-1) {
+		currentItem =-1;
+	} 
+	goTo(++currentItem, precedentItem);
 })
 
 prevBtn.addEventListener("click", function(){
 	console.log("click sur la flèche gauche");
 	precedentItem = currentItem;
-	if(currentItem === 0) currentItem =4;
-	goTo(--currentItem);
+	if(currentItem === 0) {
+		currentItem =slides.length;
+	}
+	goTo(--currentItem, precedentItem);
 })
 
-function goTo(index) {
+//étape 5
+function goTo(index, precedent) {
 	console.log(index);
 	let currentPosition = Math.abs(index); //La valeur absolue du nombre passé en argument.
 
 	//switch the image : 
-	switchImage(currentPosition);
+	switchImage(currentPosition, precedent);
 
 	// update the text
 	updateText(currentPosition);
 
 	// update the dots
-	updateDot(currentPosition);	
+	updateDot(currentPosition, precedent);	
 }
 
-function switchImage(Position) {
-	let translateX = Position * -100;
-	let containerCarrousel=document.getElementsByClassName("carrousel_container")[0];
-	containerCarrousel.style.transform = 'translate3d(' + translateX + '%, 0, 0)';
-}
+function switchImage(position, precedent) {
+	const currentImg = document.getElementById("banner-img-"+position);
+	const precedentImg = document.getElementById("banner-img-"+precedent);
+	currentImg.classList.replace('hide','show');
+	precedentImg.classList.replace('show','hide');
+} 
 
-function updateText(Position){
+function updateText(position){
 	let paragraphe = document.getElementsByTagName("p")[0];
-	let newText = slides[Position].tagLine;
+	let newText = slides[position].tagLine;
 	paragraphe.innerHTML = newText;
 }
 
-function updateDot(Position){
-	let precendentDot = document.getElementById(precedentItem);
+function updateDot(position, precedent){
+	let precendentDot = document.getElementById(precedent);
 	precendentDot.className = 'dot';
 
-	let currentDot = document.getElementById(Position);
+	let currentDot = document.getElementById(position);
 	currentDot.className = 'dot dot_selected';
 }
 
